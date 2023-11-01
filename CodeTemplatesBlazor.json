@@ -1,0 +1,243 @@
+{
+  "interpreter": "Blazor_DN7",
+  "tasks": [
+    {
+      "name": "IndexView_page",
+      "description": "Generate an index view page for a given class.",
+      "detailedDescription": " Generates a Mudblazor Data grid, jus the generic simple data grid.",
+      "targetfolder": "Pages",
+      "template": "MudBlazor",
+      "requires": [ "Mudblazor" ],
+      "actions": [
+        {
+          "actionType": "Index_View",
+          "outputType": "razor",
+          "multiplicity": true,
+          "codeTemplate": "@using MudBlazor\n @using System.Net.Http.Json\n\n<MudDataGrid Items=\"@{listsourceitems}\">\n    <Columns>\n        {ClassProperties}\n    </Columns>\n</MudDataGrid>\n@code { \n    private IEnumerable<{FullyQualifiedClassName}> {listsourceitems} = new List<{FullyQualifiedClassName}>();\n\n    protected override async Task OnInitializedAsync()\n    {\n        {listsourceitems} = await httpClient.GetFromJsonAsync<List<{FullyQualifiedClassName}>>(\"webapi/{ClassName.ToLower()}\");\n    }\n}",
+          "propertyTemplate": "<PropertyColumn Property=\"x => x.{PropertyName}\" Title=\"{PropertyName}\" />"
+        }
+      ],
+      "options": {
+        "dbcontext": true,
+        "updateonevent": true,
+        "genericdatasourcecompat": true,
+        "dbgenericdatasourcecoexist": true,
+        "generatecoexistsync": true
+      }
+    },
+    {
+      "name": "MudDataGridWSearch",
+      "description": "Generate a custom MudDataGrid with features like multi-selection, sorting, filtering, and event handling.",
+      "targetfolder": "Pages/Components",
+      "template": "MudBlazor",
+      "requires": [ "Mudblazor" ],
+      "actions": [
+        {
+          "actionType": "CustomMudDataGrid_View",
+          "outputType": "razor",
+          "multiplicity": true,
+          "codeTemplate": "@using System.Net.Http.Json\n@using MudBlazor.Examples.Data.Models\n@inject HttpClient httpClient\n\n<MudDataGrid T=\"Element\" MultiSelection=\"true\" Items=\"@Elements\" SortMode=\"SortMode.Multiple\" Filterable=\"true\" QuickFilter=\"@_quickFilter\"\n    Hideable=\"true\" RowClick=\"@RowClicked\" SelectedItemsChanged=\"@SelectedItemsChanged\">\n    <ToolBarContent>\n        <MudText Typo=\"Typo.h6\">Periodic Elements</MudText>\n        <MudSpacer />\n        <MudTextField @bind-Value=\"_searchString\" Placeholder=\"Search\" Adornment=\"Adornment.Start\" Immediate=\"true\"\n            AdornmentIcon=\"@Icons.Material.Filled.Search\" IconSize=\"Size.Medium\" Class=\"mt-0\"></MudTextField>\n    </ToolBarContent>\n    <Columns>\n        <SelectColumn T=\"Element\" />\n        <PropertyColumn Property=\"x => x.Number\" Title=\"Nr\" Sortable=\"false\" Filterable=\"false\" />\n        <PropertyColumn Property=\"x => x.Sign\" />\n        <PropertyColumn Property=\"x => x.Name\" SortBy=\"@_sortBy\" />\n        <PropertyColumn Property=\"x => x.Position\" />\n        <PropertyColumn Property=\"x => x.Molar\" Title=\"Molar mass\" />\n        <PropertyColumn Property=\"x => x.Group\" Title=\"Category\" />\n    </Columns>\n    <PagerContent>\n        <MudDataGridPager T=\"Element\" />\n    </PagerContent>\n</MudDataGrid>\n\n<div class=\"d-flex flex-wrap mt-4\">\n    <MudSwitch @bind-Checked=\"_sortNameByLength\" Color=\"Color.Primary\">Sort Name Column By Length</MudSwitch>\n</div>\n\n<MudExpansionPanels Style=\"flex:1\">\n    <MudExpansionPanel Text=\"Show Events\">\n        @foreach (var message in _events)\n        {\n            <MudText Typo=\"@Typo.body2\">@message</MudText>\n        }\n        @if(_events.Count > 0) \n        {\n            <div class=\"d-flex\">\n                <MudSpacer/>\n                <MudButton Class=\"mt-3\" ButtonType=\"ButtonType.Button\" Variant=\"Variant.Filled\" OnClick=\"@(() => _events.Clear())\">Clear</MudButton>\n            </div>\n        }\n    </MudExpansionPanel>\n</MudExpansionPanels>\n@code {\n    private IEnumerable<Element> Elements = new List<Element>();\n    private string _searchString;\n    private bool _sortNameByLength;\n    private List<string> _events = new();\n    // custom sort by name length\n    private Func<Element, object> _sortBy => x =>\n    {\n        if (_sortNameByLength)\n            return x.Name.Length;\n        else\n            return x.Name;\n    };\n    // quick filter - filter globally across multiple columns with the same input\n    private Func<Element, bool> _quickFilter => x =>\n    {\n        if (string.IsNullOrWhiteSpace(_searchString))\n            return true;\n\n        if (x.Sign.Contains(_searchString, StringComparison.OrdinalIgnoreCase))\n            return true;\n\n        if (x.Name.Contains(_searchString, StringComparison.OrdinalIgnoreCase))\n            return true;\n\n        if ($\"{x.Number} {x.Position} {x.Molar}\".Contains(_searchString))\n            return true;\n\n        return false;\n    };\n\n    protected override async Task OnInitializedAsync()\n    {\n        Elements = await httpClient.GetFromJsonAsync<List<Element>>(\"webapi/periodictable\");\n    }\n\n    // events\n    void RowClicked(DataGridRowClickEventArgs<Element> args)\n    {\n        _events.Insert(0, $\"Event = RowClick, Index = {args.RowIndex}, Data = {System.Text.Json.JsonSerializer.Serialize(args.Item)}\");\n    }\n\n    void SelectedItemsChanged(HashSet<Element> items)\n    {\n        _events.Insert(0, $\"Event = SelectedItemsChanged, Data = {System.Text.Json.JsonSerializer.Serialize(items)}\");\n    }\n}"
+        }
+      ]
+    }
+    ,
+    {
+      "name": "IndexView_Component",
+      "description": "Generate an index view component for a given class.",
+      "detailedDescription": "",
+      "targetfolder": "Pages/Components",
+      "template": "MudBlazor",
+      "requires": ["Mudblazor"],
+      "actions": [
+        {
+          "actionType": "Index_View",
+          "outputType": "razor",
+          "multiplicity": true,
+          "codeTemplate": "@using MudBlazor\n@using System.Net.Http.Json\n\n<MudDataGrid Items=\"@{listsourceitems}\">\n    <Columns>\n        {ClassProperties}\n    </Columns>\n</MudDataGrid>\n@code {{ \n    private IEnumerable{FullyQualifiedClassName} {listsourceitems} = new List{FullyQualifiedClassName}();\n\n    protected override async Task OnInitializedAsync()\n    {\n        {listsourceitems} = await httpClient.GetFromJsonAsync<List<{FullyQualifiedClassName}>>(\"webapi/{ClassName.ToLower()}\");\n    }\n}}",
+          "propertyTemplate": "<PropertyColumn Property=\"x => x.{PropertyName}\" Title=\"{PropertyName}\" />"
+        }
+      ]
+    },
+    {
+      "name": "MudCarousel_Component",
+      "description": "Generate a MudCarousel component for a given class.",
+      "detailedDescription": "",
+      "targetfolder": "Pages/Components",
+      "template": "MudBlazor",
+      "requires": ["Mudblazor"],
+      "actions": [
+        {
+          "actionType": "Index_View",
+          "outputType": "razor",
+          "multiplicity": true,
+          "codeTemplate": "@using MudBlazor\n\n<MudCarousel Class=\"mud-width-full\" Style=\"height:200px;\" ShowArrows=\"@arrows\" ShowBullets=\"@bullets\" EnableSwipeGesture=\"@enableSwipeGesture\" AutoCycle=\"@autocycle\" TData=\"object\">\n    {CarouselItems}\n</MudCarousel>\n{Controls}\n\n@code{{ \n    private bool arrows = true;\n    private bool bullets = true;\n    private bool enableSwipeGesture = true;\n    private bool autocycle = true;\n    private Transition transition = Transition.Slide;\n}}",
+          "carouselItemTemplate": "<MudCarouselItem Transition=\"transition\" Color=\"{ItemColor}\">\n    <div class=\"d-flex\" style=\"height:100%\">\n        <MudIcon Class=\"mx-auto my-auto\" Icon=\"@Icons.Custom.Brands.MudBlazor\" Size=\"@Size.Large\" />\n    </div>\n</MudCarouselItem>",
+          "controlsTemplate": "<MudSelect @bind-Value=\"transition\" Label=\"Transition\" Class=\"ma-2\">\n    <MudSelectItem Value=\"@Transition.Fade\">Fade</MudSelectItem>\n    <MudSelectItem Value=\"@Transition.Slide\">Slide</MudSelectItem>\n    <MudSelectItem Value=\"@Transition.None\">None</MudSelectItem>\n</MudSelect>\n<MudSwitch @bind-Checked=\"@arrows\" Color=\"Color.Primary\">Show Arrows</MudSwitch>\n<MudSwitch @bind-Checked=\"@bullets\" Color=\"Color.Primary\">Show Bullets</MudSwitch>\n<MudSwitch @bind-Checked=\"@enableSwipeGesture\" Color=\"Color.Primary\">Enable Swap Gesture</MudSwitch>\n<MudSwitch @bind-Checked=\"@autocycle\" Color=\"Color.Primary\">Auto Cycle (Default: 5 secs)</MudSwitch>"
+        }
+      ]
+    },
+    {
+      "name": "MudChart_Component",
+      "description": "Generate a MudChart component for a given dataset.",
+      "detailedDescription": "",
+      "targetfolder": "Pages/Components",
+      "template": "MudBlazor",
+      "requires": ["Mudblazor"],
+      "actions": [
+        {
+          "actionType": "Index_View",
+          "outputType": "razor",
+          "multiplicity": false,
+          "codeTemplate": "<div>\n    <MudChart ChartType=\"ChartType.Bar\" ChartSeries=\"@Series\" @bind-SelectedIndex=\"Index\" XAxisLabels=\"@XAxisLabels\" YAxisTitle=\"{YAxisTitle}\" Width=\"100%\" Height=\"350px\"></MudChart>\n</div>\n<MudText Typo=\"Typo.h6\">Selected portion of the chart: @Index</MudText>\n@code {{\n    private int Index = -1; //default value cannot be 0 -> first selectedindex is 0.\n\n    public List<ChartSeries> Series = new List<ChartSeries>()\n    {\n        {ChartData}\n    };\n    public string[] XAxisLabels = { {XAxisLabels} };\n}}",
+          "chartDataTemplate": "new ChartSeries() { Name = \"{CountryName}\", Data = new double[] { {DataValues} } },",
+          "xAxisLabelsTemplate": "\"{MonthName}\","
+        }
+      ],
+      "requiresAxis": true
+    },
+    {
+      "name": "MudDialog_Component",
+      "description": "Generate a MudDialog component for a given dataset.",
+      "detailedDescription": "",
+      "targetfolder": "Pages/Components",
+      "template": "MudBlazor",
+      "requires": ["Mudblazor"],
+      "actions": [
+        {
+          "actionType": "Index_View",
+          "outputType": "razor",
+          "multiplicity": false,
+          "codeTemplate": "@using {Namespace}\n\n@inject IDialogService DialogService\n\n<div class=\"d-flex flex-wrap\">\n    @foreach (var item in {ItemsList})\n    {\n        <MudPaper Class=\"d-flex align-center pa-2 mx-2 my-2\">\n            <MudText>@item.{ItemProperty}</MudText>\n            <MudButton Variant=\"Variant.Text\" Color=\"Color.Error\" OnClick=\"@((e) => DeleteItem(item))\">Delete</MudButton>\n        </MudPaper>\n    }\n</div>\n@code {{\n\n    async Task DeleteItem({ItemType} item)\n    {\n        var parameters = new DialogParameters<{DialogComponent}> {{ x => x.{DialogParameter}, item }};\n\n        var dialog = await DialogService.ShowAsync<{DialogComponent}>(\"Delete {ItemName}\", parameters);\n        var result = await dialog.Result;\n\n        if (!result.Canceled)\n        {\n            {ItemDeletionLogic}\n        }\n    }\n\n    public List<{ItemType}> {ItemsList} { get; } = {DefaultItems};\n}}"
+        }
+      ],
+      "requiresDialogService": true
+    },
+    {
+      "name": "MudDataGrid_InlineEditing",
+      "description": "Generate a MudDataGrid with inline editing capabilities.",
+      "detailedDescription": "",
+      "targetfolder": "Pages/Components",
+      "template": "MudBlazor",
+      "requires": ["Mudblazor"],
+      "actions": [
+        {
+          "actionType": "Index_View_IE",
+          "outputType": "razor",
+          "multiplicity": true,
+          "codeTemplate": "@using {Namespace}\n@inject HttpClient httpClient\n\n<MudDataGrid T=\"{DataType}\" Items=\"@Items\" ReadOnly=\"@_readOnly\" EditMode=\"@(_isCellEditMode ? DataGridEditMode.Cell : DataGridEditMode.Form)\"\n    StartedEditingItem=\"@StartedEditingItem\" CanceledEditingItem=\"@CanceledEditingItem\" CommittedItemChanges=\"@CommittedItemChanges\"\n    Bordered=\"true\" Dense=\"true\" EditTrigger=\"@(_editTriggerRowClick ? DataGridEditTrigger.OnRowClick : DataGridEditTrigger.Manual)\">\n    {Columns}\n</MudDataGrid>\n\n{AdditionalUI}\n\n@code {{\n    private IEnumerable<{DataType}> Items = new List<{DataType}>();\n    private bool _readOnly;\n    private bool _isCellEditMode;\n    private List<string> _events = new();\n    private bool _editTriggerRowClick;\n\n    protected override async Task OnInitializedAsync()\n    {\n        Items = await httpClient.GetFromJsonAsync<List<{DataType}>>(\"{DataEndpoint}\");\n    }\n\n    {EventHandlers}\n}}"
+
+        }
+      ],
+      "requiresDialogService": true
+    },
+    {
+      "name": "generic CRUD",
+      "description": "Generate CRUD operations for a given class.",
+      "detailedDescription": "",
+      "template": "DefaultCRUD",
+      "codeTemplate": "{CRUDOperations}",
+      "canUseDBContext": true,
+      "namingConvention": "{classname}_{function}",
+      "actions": [
+        {
+          "actionType": "Index_View",
+          "multiplicity": true,
+
+          "codeTemplate": "{CreateOperationCode}"
+        },
+        {
+          "actionType": "Create_View",
+          "codeTemplate": "{CreateOperationCode}"
+        },
+        {
+          "actionType": "Read_View",
+          "codeTemplate": "{ReadOperationCode}"
+        },
+        {
+          "actionType": "Update_View",
+          "codeTemplate": "{UpdateOperationCode}"
+        },
+        {
+          "actionType": "Delete_View",
+          "codeTemplate": "{DeleteOperationCode}"
+        },
+        {
+          "actionType": "Index_Function",
+          "multiplicity": true,
+          "codeTemplate": "{CreateOperationCode}"
+        },
+        {
+          "actionType": "Create_Function",
+          "codeTemplate": "{CreateOperationCode}"
+        },
+        {
+          "actionType": "Read_Function",
+          "codeTemplate": "{ReadOperationCode}"
+        },
+        {
+          "actionType": "Update_Function",
+          "codeTemplate": "{UpdateOperationCode}"
+        },
+        {
+          "actionType": "Delete_Function",
+          "codeTemplate": "{DeleteOperationCode}"
+        },
+        {
+          "actionType": "BackendService",
+          "codeTemplate": "{BackendServiceCode}"
+        }
+      ]
+    }
+  ],
+  "Requirements": [
+    {
+      "SolutionType": "Blazor Server",
+      "LibraryName": "MudBlazor",
+      "References": {
+        "targetfile": "Program.cs",
+        "insertafter": "using *",
+        "references": [ "using MudBlazor.Services;" ]
+
+
+      },
+      "Services": {
+        "LibraryName": "MudBlazor",
+        "targetfile": "Program.cs",
+        "insertbefore": "var app = builder.Build();",
+        "services": [ "builder.Services.AddMudServices();" ]
+      },
+      "BlazorImports": [
+        {
+          "LibraryName": "MudBlazor",
+          "targetfile": "_Imports.razor",
+          "components": [ "@using MudBlazor" ]
+        }
+      ],
+      "BlazorLayouts": {
+        "LibraryName": "MudBlazor",
+        "targetfile": "MainLayout.razor",
+        "components": [ "@using MudBlazor", "<MudThemeProvider />", "<MudSnackbarProvider />", "<MudDialogProvider />" ]
+      },
+      "additioncss": {
+        "LibraryName": "MudBlazor",
+        "targetfile": "_Host.cshtml",
+        "insertaferlast": "rel=\"stylesheet\"",
+        "components": [ "https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap", "_content/Blazorise.Icons.Material/blazorise.icons.material.css", "_content/Blazor.Bootstrap/blazor.bootstrap.css", "_content/MudBlazor/MudBlazor.min.css" ]
+      },
+      "additioncjs": {
+        "LibraryName": "MudBlazor",
+        "targetfile": "_Host.cshtml",
+        "insertafterlast": "<script src=,</body>",
+        "components": [ "<script src=\"_content/MudBlazor/MudBlazor.min.js\"></script>" ]
+
+      },
+      "additionBlazorComponents": {
+        "LibraryName": "MudBlazor",
+        "targetfile": "MainLayout.razor",
+        "insertafterlast": "</main>",
+        "components": [ "<MudThemeProvider />", "<MudSnackbarProvider />", "<MudDialogProvider />" ]
+      },
+      "requiredNugetpackages": [ "MudBlazor" ]
+    }
+  ]
+}
