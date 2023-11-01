@@ -27,7 +27,7 @@
       }
     },
     {
-      "name": "MudDataGridWSearch",
+      "name": "MudDataGridWSearchw",
       "description": "Generate a custom MudDataGrid with features like multi-selection, sorting, filtering, and event handling.",
       "targetfolder": "Pages/Components",
       "template": "MudBlazor",
