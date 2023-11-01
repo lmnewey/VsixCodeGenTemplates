@@ -1,5 +1,4 @@
 {
-  "repoV": "0.0.1"
   "interpreter": "Blazor_DN7",
   "tasks": [
     {
@@ -27,8 +26,9 @@
       }
     },
     {
-      "name": "MudDataGridWSearchw",
+      "name": "CustomMudDataGrid",
       "description": "Generate a custom MudDataGrid with features like multi-selection, sorting, filtering, and event handling.",
+      "detailedDescription": "Provides a custom view with advanced features for better data representation.",
       "targetfolder": "Pages/Components",
       "template": "MudBlazor",
       "requires": [ "Mudblazor" ],
@@ -37,11 +37,15 @@
           "actionType": "CustomMudDataGrid_View",
           "outputType": "razor",
           "multiplicity": true,
-          "codeTemplate": "@using System.Net.Http.Json\n@using MudBlazor.Examples.Data.Models\n@inject HttpClient httpClient\n\n<MudDataGrid T=\"Element\" MultiSelection=\"true\" Items=\"@Elements\" SortMode=\"SortMode.Multiple\" Filterable=\"true\" QuickFilter=\"@_quickFilter\"\n    Hideable=\"true\" RowClick=\"@RowClicked\" SelectedItemsChanged=\"@SelectedItemsChanged\">\n    <ToolBarContent>\n        <MudText Typo=\"Typo.h6\">Periodic Elements</MudText>\n        <MudSpacer />\n        <MudTextField @bind-Value=\"_searchString\" Placeholder=\"Search\" Adornment=\"Adornment.Start\" Immediate=\"true\"\n            AdornmentIcon=\"@Icons.Material.Filled.Search\" IconSize=\"Size.Medium\" Class=\"mt-0\"></MudTextField>\n    </ToolBarContent>\n    <Columns>\n        <SelectColumn T=\"Element\" />\n            </Columns>\n    <PagerContent>\n        <MudDataGridPager T=\"Element\" />\n    </PagerContent>\n</MudDataGrid>\n\n<div class=\"d-flex flex-wrap mt-4\">\n    <MudSwitch @bind-Checked=\"_sortNameByLength\" Color=\"Color.Primary\">Sort Name Column By Length</MudSwitch>\n</div>\n\n<MudExpansionPanels Style=\"flex:1\">\n    <MudExpansionPanel Text=\"Show Events\">\n        @foreach (var message in _events)\n        {\n            <MudText Typo=\"@Typo.body2\">@message</MudText>\n        }\n        @if(_events.Count > 0) \n        {\n            <div class=\"d-flex\">\n                <MudSpacer/>\n                <MudButton Class=\"mt-3\" ButtonType=\"ButtonType.Button\" Variant=\"Variant.Filled\" OnClick=\"@(() => _events.Clear())\">Clear</MudButton>\n            </div>\n        }\n    </MudExpansionPanel>\n</MudExpansionPanels>\n@code {\n    private IEnumerable<Element> Elements = new List<Element>();\n    private string _searchString;\n    private bool _sortNameByLength;\n    private List<string> _events = new();\n    // custom sort by name length\n    private Func<Element, object> _sortBy => x =>\n    {\n        if (_sortNameByLength)\n            return x.Name.Length;\n        else\n            return x.Name;\n    };\n    // quick filter - filter globally across multiple columns with the same input\n    private Func<Element, bool> _quickFilter => x =>\n    {\n        if (string.IsNullOrWhiteSpace(_searchString))\n            return true;\n\n        if (x.Sign.Contains(_searchString, StringComparison.OrdinalIgnoreCase))\n            return true;\n\n        if (x.Name.Contains(_searchString, StringComparison.OrdinalIgnoreCase))\n            return true;\n\n        if ($\"{x.Number} {x.Position} {x.Molar}\".Contains(_searchString))\n            return true;\n\n        return false;\n    };\n\n    protected override async Task OnInitializedAsync()\n    {\n        Elements = await httpClient.GetFromJsonAsync<List<Element>>(\"webapi/periodictable\");\n    }\n\n    // events\n    void RowClicked(DataGridRowClickEventArgs<Element> args)\n    {\n        _events.Insert(0, $\"Event = RowClick, Index = {args.RowIndex}, Data = {System.Text.Json.JsonSerializer.Serialize(args.Item)}\");\n    }\n\n    void SelectedItemsChanged(HashSet<Element> items)\n    {\n        _events.Insert(0, $\"Event = SelectedItemsChanged, Data = {System.Text.Json.JsonSerializer.Serialize(items)}\");\n    }\n}"
-          "propertyTemplate": "<PropertyColumn Property=\"x => x.{PropertyName}\" Title=\"{PropertyName}\"  SortBy=\"@_sortBy\" />",
-          "Temp": "<PropertyColumn Property=\"x => x.Number\" Title=\"Nr\" Sortable=\"false\" Filterable=\"false\" />\n        <PropertyColumn Property=\"x => x.Sign\" />\n        <PropertyColumn Property=\"x => x.Name\" SortBy=\"@_sortBy\" />\n        <PropertyColumn Property=\"x => x.Position\" />\n        <PropertyColumn Property=\"x => x.Molar\" Title=\"Molar mass\" />\n        <PropertyColumn Property=\"x => x.Group\" Title=\"Category\" />\n"
+          "codeTemplate": "@using MudBlazor\n@using System.Net.Http.Json\n\n<MudDataGrid T=\"{FullyQualifiedClassName}\" MultiSelection=\"true\" Items=\"@{listsourceitems}\" SortMode=\"SortMode.Multiple\" Filterable=\"true\" QuickFilter=\"@_quickFilter\"\n    Hideable=\"true\" RowClick=\"@RowClicked\" SelectedItemsChanged=\"@SelectedItemsChanged\">\n    <ToolBarContent>\n        <MudText Typo=\"Typo.h6\">{ClassName}</MudText>\n        <MudSpacer />\n        {SearchField}\n    </ToolBarContent>\n    <Columns>\n        {ClassProperties}\n    </Columns>\n    <PagerContent>\n        <MudDataGridPager T=\"{FullyQualifiedClassName}\" />\n    </PagerContent>\n</MudDataGrid>\n\n{AdditionalContent}\n@code {\n    private IEnumerable<{FullyQualifiedClassName}> {listsourceitems} = new List<{FullyQualifiedClassName}>();\n    // additional fields and methods as per the requirement...\n}",
+          "propertyTemplate": "<PropertyColumn Property=\"x => x.{PropertyName}\" Title=\"{PropertyName}\" />"
         }
-      ]
+      ],
+      "options": {
+        "customToolBar": true,
+        "hideableColumns": true,
+        "multiSort": true
+      }
     }
     ,
     {
