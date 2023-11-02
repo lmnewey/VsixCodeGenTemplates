@@ -68,7 +68,12 @@
           "multiplicity": true,
           "codeTemplate": "@using FluentValidation\n\n<MudCard>\n\t<MudForm Model=\"@model\" @ref=\"@form\" Validation=\"@(orderValidator.ValidateValue)\" ValidationDelay=\"0\">\n\t\t<MudCardContent>\n\t\t\t\t{FormFields}\n\t\t</MudCardContent>\n\t\t<MudCardContent Class=\"pa-0\">\n\t\t\t{TableFields}\n\t\t</MudCardContent>\n\t</MudForm>\n    <MudCardActions>\n        <MudButton Variant=\"Variant.Filled\" Color=\"Color.Primary\" Class=\"ml-auto\" OnClick=\"@(async () => await Submit())\">Order</MudButton>\n    </MudCardActions>\n</MudCard>\n@code {\n\t{CodeSection}\n}",
           "propertyTemplate": "<MudTextField @bind-Value=\"model.{PropertyName}\" For=\"@(() => model.{PropertyName})\" Immediate=\"true\" Label=\"{PropertyName}\" />",
-          "additionalItems": []
+          "tablePropertyTemplate": "<MudTd DataLabel=\"{PropertyName}\">\n\t<MudForm Model=\"@context\">\n\t\t<MudTextField Label=\"Enter {PropertyName}\" @bind-Value=\"context.{PropertyName}\" For=\"(() => context.{PropertyName})\" />\n\t</MudForm>\n</MudTd>",
+          "additionalItems": [
+            {
+              "SearchField": "<MudTextField @bind-Value=\"_searchString\" Placeholder=\"Search\" Adornment=\"Adornment.Start\" Immediate=\"true\" AdornmentIcon=\"@Icons.Material.Filled.Search\" IconSize=\"Size.Medium\" Class=\"mt-0\"></MudTextField>"
+            }
+          ]
         }
       ],
       "options": {}
