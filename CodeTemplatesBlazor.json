@@ -25,28 +25,28 @@
         "generatecoexistsync": true
       }
     },
+   {
+  "name": "CustomMudDataGrid",
+  "description": "Generate a custom MudDataGrid with features like multi-selection, sorting, filtering, and event handling.",
+  "detailedDescription": "Provides a custom view with advanced features for better data representation.",
+  "targetfolder": "Pages/Components",
+  "template": "MudBlazor",
+  "requires": ["Mudblazor"],
+  "actions": [
     {
-      "name": "CustomMudDataGrid",
-      "description": "Generate a custom MudDataGrid with features like multi-selection, sorting, filtering, and event handling.",
-      "detailedDescription": "Provides a custom view with advanced features for better data representation.",
-      "targetfolder": "Pages/Components",
-      "template": "MudBlazor",
-      "requires": [ "Mudblazor" ],
-      "actions": [
-        {
-          "actionType": "CustomMudDataGrid_View",
-          "outputType": "razor",
-          "multiplicity": true,
-          "codeTemplate": "@using MudBlazor\n@using System.Net.Http.Json\n\n<MudDataGrid T=\"{FullyQualifiedClassName}\" MultiSelection=\"true\" Items=\"@{listsourceitems}\" SortMode=\"SortMode.Multiple\" Filterable=\"true\" QuickFilter=\"@_quickFilter\"\n    Hideable=\"true\" RowClick=\"@RowClicked\" SelectedItemsChanged=\"@SelectedItemsChanged\">\n    <ToolBarContent>\n        <MudText Typo=\"Typo.h6\">{ClassName}</MudText>\n        <MudSpacer />\n        {SearchField}\n    </ToolBarContent>\n    <Columns>\n        {ClassProperties}\n    </Columns>\n    <PagerContent>\n        <MudDataGridPager T=\"{FullyQualifiedClassName}\" />\n    </PagerContent>\n</MudDataGrid>\n\n{AdditionalContent}\n@code {\n    private IEnumerable<{FullyQualifiedClassName}> {listsourceitems} = new List<{FullyQualifiedClassName}>();\n    // additional fields and methods as per the requirement...\n    // additional fields and methods as per the requirement...\n private string _searchString;\n private bool _sortNameByLength;\n private List<string> _events = new(); \n  \n private Func<T, bool> QuickFilter<T>() => x => \n { \n    if (string.IsNullOrWhiteSpace(_searchString))\n return true; \n \n foreach (var property in typeof(T).GetProperties()) \n  { \n  var value = property.GetValue(x)?.ToString(); \n  if (value != null && value.Contains(_searchString, StringComparison.OrdinalIgnoreCase)) \n  return true; \n } \n \n return false; \n }; \n private Func<{FullyQualifiedClassName}, object> _sortBy => x => { if (_sortNameByLength) {return x.Name.Length;} else { return x.Name; }; }; \n protected override async Task OnInitializedAsync(){\n // get your items here\n }\n\n// events\n void RowClicked(DataGridRowClickEventArgs<{FullyQualifiedClassName}> args) \n {\n _events.Insert(0, {textevent} = RowClick, Index = {args.RowIndex}, Data = {System.Text.Json.JsonSerializer.Serialize(args.Item)}\"); \n }\n\n void SelectedItemsChanged(HashSet<{FullyQualifiedClassName}> items)\n {\n        _events.Insert(0, {textevent} = SelectedItemsChanged, Data = {System.Text.Json.JsonSerializer.Serialize(items)}\");\n}\n\n } \n", 
-          "propertyTemplate": "<PropertyColumn Property=\"x => x.{PropertyName}\" Title=\"{PropertyName}\" />"          
-        }
-      ],
-      "options": {
-        "customToolBar": true,
-        "hideableColumns": true,
-        "multiSort": true
-      }
+      "actionType": "CustomMudDataGrid_View",
+      "outputType": "razor",
+      "multiplicity": true,
+      "codeTemplate": "@using MudBlazor\n@using System.Net.Http.Json\n\n<MudDataGrid T=\"{FullyQualifiedClassName}\" MultiSelection=\"true\" Items=\"@{listsourceitems}\" SortMode=\"SortMode.Multiple\" Filterable=\"true\" QuickFilter=\"@_quickFilter\"\n    Hideable=\"true\" RowClick=\"@RowClicked\" SelectedItemsChanged=\"@SelectedItemsChanged\">\n    <ToolBarContent>\n        <MudText Typo=\"Typo.h6\">{ClassName}</MudText>\n        <MudSpacer />\n        {SearchField}\n    </ToolBarContent>\n    <Columns>\n        {ClassProperties}\n    </Columns>\n    <PagerContent>\n        <MudDataGridPager T=\"{FullyQualifiedClassName}\" />\n    </PagerContent>\n</MudDataGrid>\n\n{AdditionalContent}\n@code {\n    private IEnumerable<{FullyQualifiedClassName}> {listsourceitems} = new List<{FullyQualifiedClassName}>();\n    private string _searchString;\n    private List<string> _events = new();\n    private Func<{FullyQualifiedClassName}, bool> _quickFilter;\n\n    protected override void OnInitialized()\n    {\n        _quickFilter = x =>\n        {\n            if (string.IsNullOrWhiteSpace(_searchString))\n                return true;\n\n            foreach (var property in typeof({FullyQualifiedClassName}).GetProperties())\n            {\n                var value = property.GetValue(x)?.ToString();\n                if (value != null && value.Contains(_searchString, StringComparison.OrdinalIgnoreCase))\n                    return true;\n            }\n\n            return false;\n        };\n    }\n\n    private bool _sortNameByLength;\n    private Func<{FullyQualifiedClassName}, object> _sortBy => x => { if (_sortNameByLength) { return x.Name.Length; } else { return x.Name; } };\n    protected override async Task OnInitializedAsync()\n    {\n        // get your items here\n    }\n\n    void RowClicked(DataGridRowClickEventArgs<{FullyQualifiedClassName}> args)\n    {\n        _events.Insert(0, $\"Event = RowClick, Index = {args.RowIndex}, Data = {System.Text.Json.JsonSerializer.Serialize(args.Item)}\");\n    }\n\n    void SelectedItemsChanged(HashSet<{FullyQualifiedClassName}> items)\n    {\n        _events.Insert(0, $\"Event = SelectedItemsChanged, Data = {System.Text.Json.JsonSerializer.Serialize(items)}\");\n    }\n}",
+      "propertyTemplate": "<PropertyColumn Property=\"x => x.{PropertyName}\" Title=\"{PropertyName}\" />"
     }
+  ],
+  "options": {
+    "customToolBar": true,
+    "hideableColumns": true,
+    "multiSort": true
+  }
+}
     ,
     {
       "name": "IndexView_Component",
