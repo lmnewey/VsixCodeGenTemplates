@@ -55,6 +55,25 @@
       }
     },
     {
+      "name": "GenericMudForm",
+      "description": "Generate a custom order form with validation.",
+      "detailedDescription": "Provides a custom form for ordering with validation rules.",
+      "targetfolder": "Pages/Forms",
+      "template": "MudBlazor",
+      "requires": [ "Mudblazor" ],
+      "actions": [
+        {
+          "actionType": "GenericMudForm_View",
+          "outputType": "razor",
+          "multiplicity": true,
+          "codeTemplate": "@using FluentValidation\n\n<MudCard>\n\t<MudForm Model=\"@model\" @ref=\"@form\" Validation=\"@(orderValidator.ValidateValue)\" ValidationDelay=\"0\">\n\t\t<MudCardContent>\n\t\t\t\t{FormFields}\n\t\t</MudCardContent>\n\t\t<MudCardContent Class=\"pa-0\">\n\t\t\t{TableFields}\n\t\t</MudCardContent>\n\t</MudForm>\n    <MudCardActions>\n        <MudButton Variant=\"Variant.Filled\" Color=\"Color.Primary\" Class=\"ml-auto\" OnClick=\"@(async () => await Submit())\">Order</MudButton>\n    </MudCardActions>\n</MudCard>\n@code {\n\t{CodeSection}\n}",
+          "propertyTemplate": "<MudTextField @bind-Value=\"model.{PropertyName}\" For=\"@(() => model.{PropertyName})\" Immediate=\"true\" Label=\"{PropertyName}\" />",
+          "additionalItems": []
+        }
+      ],
+      "options": {}
+    },
+    {
       "name": "IndexView_Component",
       "description": "Generate an index view component for a given class.",
       "detailedDescription": "Generates a Mudblazor Data grid, just the generic simple data grid.",
