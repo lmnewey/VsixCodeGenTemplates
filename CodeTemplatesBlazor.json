@@ -47,7 +47,8 @@
             "hideableColumns": true,
             "multiSort": true
           }
-        },
+        }
+      ],
         {
           "name": "IndexView_Component",
           "description": "Generate an index view component for a given class.",
@@ -247,4 +248,5 @@
           "requiredNugetpackages": [ "MudBlazor" ]
         }
       ]
+
     }
