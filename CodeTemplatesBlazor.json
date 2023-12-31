@@ -140,6 +140,23 @@
       "requiresAxis": true
     },
     {
+      "name": "MudDialog_Component v2",
+      "description": "Generate a MudDialog component for a given dataset.",
+      "detailedDescription": "",
+      "targetfolder": "Pages/Components",
+      "template": "MudBlazor",
+      "requires": [ "Mudblazor" ],
+      "actions": [
+        {
+          "actionType": "Index_View",
+          "outputType": "razor",
+          "multiplicity": false,
+          "codeTemplate": "@using {Namespace}\n\n @inject IDialogService DialogService\n\n <MudDialogContent ><MudPaper Height=\"600px\" Width=\"100%\"> <MudContainer Width=\"100%\"> <MudPaper Height=\"570px\" Width=\"100%\" Square=\"true\"> <EditForm Model=\"@{ItemType}\" >         <div class=\"d-flex flex-wrap\">\n  @foreach (var item in {ItemsList})\n  {\n        <MudPaper Class=\"d-flex align-center pa-2 mx-2 my-2\">\n            <MudText>@item.{ItemProperty}</MudText>\n                    </MudPaper>\n    }\n</div>\n        </EditForm>        <MudButton OnClick=\"@Submit\">Save</MudButton> <MudButton Color=\"Color.Secondary\" OnClick=\"@Cancel\">Cancel</MudButton><MudButton Variant=\"Variant.Text\" Color=\"Color.Error\" OnClick=\"@((e) => DeleteItem(item))\">Delete</MudButton>\n        </MudPaper>        </MudContainer>            </MudPaper> </MudDialogContent> @code {{\n\n    async Task DeleteItem({ItemType} item)\n    {\n        var parameters = new DialogParameters<{DialogComponent}> {{ x => x.{DialogParameter}, item }};\n\n        var dialog = await DialogService.ShowAsync<{DialogComponent}>(\"Delete {ItemName}\", parameters);\n        var result = await dialog.Result;\n\n        if (!result.Canceled)\n        {\n            {ItemDeletionLogic}\n        }\n    }\n\n    public List<{ItemType}> {ItemsList} { get; } = {DefaultItems};\n}void Submit() {            MudDialog.Close(DialogResult.Ok({ItemType}));}void Cancel() { MudDialog.Cancel(); }   }}"
+        }
+      ],
+      "requiresDialogService": true
+    },
+    {
       "name": "MudDialog_Component",
       "description": "Generate a MudDialog component for a given dataset.",
       "detailedDescription": "",
